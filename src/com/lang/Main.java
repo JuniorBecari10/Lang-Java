@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Main {
-  public static String file;
+  public static String file = "REPL";
+  public static boolean hadError = false;
 
   public static void main(String[] args) {
     if (args.length > 1) {
@@ -35,11 +36,16 @@ public class Main {
   }
 
   public static void repl() {
+    System.out.println("Prism REPL");
+    System.out.println("Type 'exit!' to exit.\n");
+
     Scanner s = new Scanner(System.in);
 
     for (;;) {
       System.out.print("> ");
       String input = s.nextLine();
+
+      if (input.isBlank()) continue;
 
       if (input.equals("exit!")) {
         s.close();
@@ -57,5 +63,27 @@ public class Main {
     for (Token t : tokens) {
       System.out.println(t);
     }
+
+    if (hadError) return;
+  }
+
+  public static void reportError(String message, String help, String code, int line, int col) {
+    hadError = true;
+
+
+    System.out.println("Error: " + file + " | " + line + ":" + (col + 1));
+    System.out.println(message + "\n");
+
+    System.out.println(" " + line + " | " + code);
+
+    System.out.print("    ");
+    for (int i = 0; i < String.valueOf(line).length(); i++) {
+      System.out.print(" ");
+    }
+    
+    for (int i = 0; i < col; i++) {
+      System.out.print(" ");
+    }
+    System.out.println("^ " + help + "\n");
   }
 }

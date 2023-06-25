@@ -18,5 +18,5 @@ public enum TokenType {
   AndKw, ClassKw, ElseKw, FalseKw, TrueKw, FnKw, LoopKw, IfKw, NilKw, OrKw,
   PrintKw, PrintlnKw, RetKw, SuperKw, ThisKw, VarKw, WhileKw,
 
-  EOF
+  EOF, Error
 }

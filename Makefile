@@ -1,4 +1,4 @@
-ARGS=sla.txt
+ARGS=
 
 all: compile run
 
