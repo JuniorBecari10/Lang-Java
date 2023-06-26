@@ -13,7 +13,7 @@ public class Main {
 
   public static void main(String[] args) {
     if (args.length > 1) {
-      System.out.println("Usage: lang <script | file>");
+      System.out.println("Usage: prism [file]");
       System.exit(1);
     }
     else if (args.length == 1) {
@@ -47,12 +47,13 @@ public class Main {
 
       if (input.isBlank()) continue;
 
-      if (input.equals("exit!")) {
+      if (input.equalsIgnoreCase("exit!")) {
         s.close();
         System.exit(0);
       }
 
       run(input);
+      hadError = false;
     }
   }
 

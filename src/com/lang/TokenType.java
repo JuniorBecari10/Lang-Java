@@ -13,9 +13,11 @@ public enum TokenType {
   Greater, GreaterEqual,
   Less, LessEqual,
 
+  And, Or,
+
   Identifier, String, Number,
 
-  AndKw, ClassKw, ElseKw, FalseKw, TrueKw, FnKw, LoopKw, IfKw, NilKw, OrKw,
+  ClassKw, ElseKw, FalseKw, TrueKw, FnKw, LoopKw, IfKw, NilKw,
   PrintKw, PrintlnKw, RetKw, SuperKw, ThisKw, VarKw, WhileKw,
 
   EOF, Error

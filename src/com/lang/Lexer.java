@@ -9,7 +9,7 @@ public class Lexer {
   private int line;
 
   private StringBuilder buffer;
-  private StringBuilder code;
+  private String[] lines;
 
   public Lexer(String input) {
     this.input = input;
@@ -17,12 +17,11 @@ public class Lexer {
     this.line = 1;
 
     this.buffer = new StringBuilder();
-    this.code = new StringBuilder(String.valueOf(this.ch()));
+    this.lines = this.input.split("\n");
   }
 
   private void advance() {
     buffer.append(this.ch());
-    code.append(this.ch());
 
     this.cursor++;
   }
@@ -43,14 +42,22 @@ public class Lexer {
     return this.input.charAt(this.cursor + 1);
   }
 
+  private boolean isAtEnd() {
+    return this.cursor >= input.length();
+  }
+
   private Token nextToken() {
+    while (this.ch() == ' ') this.advanceNoConsume();
+    while (this.ch() == '\n') { this.line++; this.advanceNoConsume(); }
+
     this.buffer = new StringBuilder(String.valueOf(this.ch()));
-    Token t = null;
+    Token t = newToken(TokenType.Error);
+
+    int start = this.cursor;
+
+    if (isAtEnd()) return new Token(TokenType.EOF, "", null, line);
 
     switch (this.ch()) {
-      case 0: t = new Token(TokenType.EOF, buffer.toString(), null, line);
-      case '\n': line++; this.code = new StringBuilder(); break;
-
       case '+': t = newToken(TokenType.Plus); break;
       case '-': t = newToken(TokenType.Minus); break;
       case '*': t = newToken(TokenType.Star); break;
@@ -64,6 +71,9 @@ public class Lexer {
       case ',': t = newToken(TokenType.Comma); break;
       case '.': t = newToken(TokenType.Dot); break;
       case ';': t = newToken(TokenType.Semicolon); break;
+
+      case '&': t = newToken(TokenType.And); break;
+      case '|': t = newToken(TokenType.Or); break;
 
       case '!':
         if (this.peek() == '=') { t = newToken(TokenType.BangEqual); break; }
@@ -88,26 +98,54 @@ public class Lexer {
 
         t = newToken(TokenType.Less);
         break;
+      
+      case '"':
+        this.advanceNoConsume();
+        while (this.peek() != '"' && !isAtEnd()) {
+          if (this.peek() == '\n') line++;
+          this.advance();
+        }
+
+        if (isAtEnd()) {
+          Main.reportError("Unterminated string.", "This string doesn't have a closing '\"'.", this.lines[this.line - 1], this.line, start);
+          break;
+        }
+
+        advance();
+        advance();
+
+        t = newToken(TokenType.String);
+        break;
+      
+      default:
+          if (isIdentStart(this.ch())) {
+            this.advanceNoConsume();
+            while (isIdent(this.ch())) this.advance();
+
+            TokenType type = Token.keywords.get(buffer.toString());
+            if (type == null) type = TokenType.Identifier;
+
+            t = newToken(type);
+          }
+
+          else if (isNumber(this.ch())) {
+            this.advanceNoConsume();
+            while (isNumber(this.ch())) this.advance();
+
+            Double lit = null;
+
+            try {
+              lit = Double.parseDouble(buffer.toString());
+            } catch (NumberFormatException e) {
+              Main.reportError("Couldn't parse number.", "Note: you may have put 2 or more points in there. Consider deleting one.", this.lines[this.line - 1], this.line, start);
+            }
+
+            t = newToken(TokenType.Number, lit);
+          }
     }
 
-    if (isIdentStart(this.ch())) {
-      this.advanceNoConsume();
-      while (isIdent(this.ch())) this.advance();
-
-      t = newToken(TokenType.Identifier);
-    }
-
-    if (isNumber(this.ch())) {
-      this.advanceNoConsume();
-      while (isNumber(this.ch())) this.advance();
-
-      Double lit = Double.parseDouble(buffer.toString());
-      t = newToken(TokenType.Number, lit);
-    }
-
-    if (t == null) {
-      Main.reportError("Unknown token.", "This token ('" + this.ch() + "') wasn't recognized, delete it.", code.toString(), this.line, this.cursor);
-      t = newToken(TokenType.Error);
+    if (t.type() == TokenType.Error && !Main.hadError) {
+      Main.reportError("Unknown token.", "This token ('" + this.ch() + "') wasn't recognized, delete it.", this.lines[this.line - 1], this.line, start);
     }
 
     this.advance();
@@ -143,6 +181,7 @@ public class Lexer {
       t = this.nextToken();
     }
 
+    tokens.add(t);
     return tokens;
   }
 }
