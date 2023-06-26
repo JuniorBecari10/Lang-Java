@@ -9,6 +9,22 @@ public abstract class Exp {
     }
   }
 
+  static class LitNum extends Exp {
+    final double value;
+
+    public LitNum(double value) {
+      this.value = value;
+    }
+  }
+
+  static class LitStr extends Exp {
+    final String value;
+
+    public LitStr(String value) {
+      this.value = value;
+    }
+  }
+
   static class Bin extends Exp {
     final Exp left;
     final Token op;
