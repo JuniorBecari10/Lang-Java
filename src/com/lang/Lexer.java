@@ -49,6 +49,10 @@ public class Lexer {
   private Token nextToken() {
     while (this.ch() == ' ') this.advanceNoConsume();
     while (this.ch() == '\n') { this.line++; this.advanceNoConsume(); }
+    
+    if (this.ch() == '#') {
+      while (this.peek() != '\n' && !isAtEnd()) this.advanceNoConsume();
+    }
 
     this.buffer = new StringBuilder(String.valueOf(this.ch()));
     Token t = newToken(TokenType.Error);
