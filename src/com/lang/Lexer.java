@@ -97,7 +97,7 @@ public class Lexer {
         t = newToken(TokenType.Greater);
         break;
       
-      case '<':
+      case '<': // TODO fix this
         if (this.peek() == '=') { t = newToken(TokenType.LessEqual); break; }
 
         t = newToken(TokenType.Less);
