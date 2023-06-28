@@ -9,18 +9,10 @@ public abstract class Expr {
     }
   }
 
-  static class LitNum extends Expr {
-    final double value;
+  static class Literal extends Expr {
+    final Object value;
 
-    public LitNum(double value) {
-      this.value = value;
-    }
-  }
-
-  static class LitStr extends Expr {
-    final String value;
-
-    public LitStr(String value) {
+    public Literal(Object value) {
       this.value = value;
     }
   }
@@ -34,6 +26,24 @@ public abstract class Expr {
       this.left = left;
       this.op = op;
       this.right = right;
+    }
+  }
+
+  static class Unary extends Expr {
+    final Token op;
+    final Expr expr;
+
+    public Unary(Token op, Expr expr) {
+      this.op = op;
+      this.expr = expr;
+    }
+  }
+
+  static class Group extends Expr {
+    final Expr expr;
+
+    public Group(Expr expr) {
+      this.expr = expr;
     }
   }
 }
